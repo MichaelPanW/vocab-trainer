@@ -5,12 +5,16 @@ import json
 import config
 import os
 import re
+from colorama import init, Fore, Style
 from dotenv import load_dotenv
 from quiz_history import (
     update_history,
     select_words_based_on_history,
     check_all_words_mastered,
 )
+
+# 初始化 colorama
+init()
 
 # 載入環境變數
 load_dotenv()
@@ -50,6 +54,21 @@ def format_question(question):
     return question
 
 
+def highlight_differences(user_input, correct_answer):
+    result = []
+    for i in range(max(len(user_input), len(correct_answer))):
+        if i >= len(user_input) or i >= len(correct_answer):
+            if i < len(user_input):
+                result.append(Fore.RED + user_input[i] + Style.RESET_ALL)
+            else:
+                result.append(Fore.GREEN + correct_answer[i] + Style.RESET_ALL)
+        elif user_input[i] != correct_answer[i]:
+            result.append(Fore.RED + user_input[i] + Style.RESET_ALL)
+        else:
+            result.append(Fore.GREEN + user_input[i] + Style.RESET_ALL)
+    return "".join(result)
+
+
 if __name__ == "__main__":
     data_list = get_data_list()
     show_data_list(data_list)
@@ -65,6 +84,7 @@ if __name__ == "__main__":
         skipped_questions = []
         correct_words = []
         failed_words = []
+        last_input = ""
 
         def finish_quiz():
             print(config.EXIT_MESSAGE)
@@ -77,15 +97,15 @@ if __name__ == "__main__":
             if check:
                 answer, meaning = random.choice(list(words.items()))
                 check = False
-                print(meaning)
+                # 變顏色
+                print(Fore.BLUE + meaning + Style.RESET_ALL)
                 # 顯示頭尾
                 print(answer[0], "_" * (len(answer) - 2), answer[-1])
 
             question = input("Ans >> ")
-            question = format_question(question)
+            question_format = format_question(question)
             answer_format = format_question(answer)
-
-            if question == answer_format:
+            if question_format == answer_format:
                 check = True
                 count = 0
                 words.pop(answer)
@@ -93,13 +113,17 @@ if __name__ == "__main__":
                 print(config.CORRECT_MESSAGE.format(count=len(words)))
             elif question == "next":
                 print(f"放棄此題，答案是：{answer}")
+                if last_input and last_input != "next":
+                    print(f"你的答案：{highlight_differences(last_input, answer)}")
+                    print(f"正確答案：{answer}")
                 skipped_questions.append((answer, meaning))
                 words.pop(answer)
                 check = True
                 count = 0
             elif question == "":
                 continue
-            elif question != answer_format:
+            elif question != answer:
+                last_input = question
                 print(config.TRY_AGAIN_MESSAGE)
                 count += 1
 
