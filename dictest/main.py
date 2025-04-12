@@ -4,6 +4,7 @@ import random
 import json
 import config
 import os
+import re
 from dotenv import load_dotenv
 from quiz_history import (
     update_history,
@@ -41,6 +42,14 @@ def show_data_list(data_list):
         print(f"{i}: {filename}")
 
 
+def format_question(question):
+    # 僅保留英文用正規表達式
+    question = re.sub(r"[^a-zA-Z]", "", question)
+    # 轉換為小寫
+    question = question.lower()
+    return question
+
+
 if __name__ == "__main__":
     data_list = get_data_list()
     show_data_list(data_list)
@@ -73,8 +82,10 @@ if __name__ == "__main__":
                 print(answer[0], "_" * (len(answer) - 2), answer[-1])
 
             question = input("Ans >> ")
+            question = format_question(question)
+            answer_format = format_question(answer)
 
-            if question == answer:
+            if question == answer_format:
                 check = True
                 count = 0
                 words.pop(answer)
@@ -86,7 +97,9 @@ if __name__ == "__main__":
                 words.pop(answer)
                 check = True
                 count = 0
-            elif question != answer:
+            elif question == "":
+                continue
+            elif question != answer_format:
                 print(config.TRY_AGAIN_MESSAGE)
                 count += 1
 
@@ -118,3 +131,6 @@ if __name__ == "__main__":
         # 檢查是否所有題目都曾經答對過
         if check_all_words_mastered(quiz_name, all_words):
             print("\n恭喜！你已經完全掌握這個題庫的所有單字了！🎉")
+
+        # 分隔線
+        print("-" * 50)
