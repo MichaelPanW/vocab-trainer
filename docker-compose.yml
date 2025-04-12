@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dictest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./dictest:/app/dictest
+      - ./data:/app/data
+    working_dir: /app
+    stdin_open: true
+    tty: true 
