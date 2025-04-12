@@ -2,3 +2,4 @@ __pycache__
 
 .vscode
 .pytest_chace
+quiz_history.json

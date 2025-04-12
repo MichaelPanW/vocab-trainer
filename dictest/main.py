@@ -5,21 +5,22 @@ import json
 import config
 import os
 from dotenv import load_dotenv
-from quiz_history import update_history, select_words_based_on_history, select_random_questions, check_all_words_mastered
+from quiz_history import (
+    update_history,
+    select_words_based_on_history,
+    check_all_words_mastered,
+)
 
 # 載入環境變數
 load_dotenv()
 
-DATA_PATH = os.getenv('DATA_PATH', '../data')
-MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', 5))
-
-def get_quiz_data_from_input():
-    return input("請輸入要測驗的題庫(0) >> ")
+DATA_PATH = os.getenv("DATA_PATH", "../data")
+MAX_QUESTIONS = int(os.getenv("MAX_QUESTIONS", 5))
 
 
 def get_words_by_info(file_name):
     try:
-        with open(f'{DATA_PATH}/{file_name}', 'r', encoding="UTF8") as f:
+        with open(f"{DATA_PATH}/{file_name}", "r", encoding="UTF8") as f:
             words = json.load(f)
         return words
     except Exception as e:
@@ -27,20 +28,23 @@ def get_words_by_info(file_name):
         print(e)
         exit(1)
 
+
 def get_data_list():
     # 只取json檔案
-    data_list = [f for f in os.listdir(DATA_PATH) if f.endswith('.json')]
+    data_list = [f for f in os.listdir(DATA_PATH) if f.endswith(".json")]
     return data_list
+
 
 def show_data_list(data_list):
     print("選擇要測驗的題庫")
     for i, filename in enumerate(data_list):
         print(f"{i}: {filename}")
 
+
 if __name__ == "__main__":
     data_list = get_data_list()
     show_data_list(data_list)
-    index = int(input("請輸入要測驗的題庫編號 >> "))
+    index = int(input("請輸入要測驗的題庫編號 >> ", "0"))
     quiz_name = data_list[index]
 
     check = True
@@ -65,7 +69,7 @@ if __name__ == "__main__":
             check = False
             print(meaning)
             # 顯示頭尾
-            print(answer[0],'_'*(len(answer)-2), answer[-1])
+            print(answer[0], "_" * (len(answer) - 2), answer[-1])
 
         question = input("Ans >> ")
 
@@ -104,10 +108,12 @@ if __name__ == "__main__":
         print("\n放棄的題目：")
         for word, meaning in skipped_questions:
             print(f"{word}: {meaning}")
-    
+
     # 更新測驗歷史
-    update_history(quiz_name, correct_words, [w[0] for w in skipped_questions], failed_words)
-    
+    update_history(
+        quiz_name, correct_words, [w[0] for w in skipped_questions], failed_words
+    )
+
     # 檢查是否所有題目都曾經答對過
     if check_all_words_mastered(quiz_name, all_words):
         print("\n恭喜！你已經完全掌握這個題庫的所有單字了！🎉")
