@@ -5,7 +5,7 @@ import json
 import config
 import os
 from dotenv import load_dotenv
-from quiz_history import update_history, select_words_based_on_history, select_random_questions
+from quiz_history import update_history, select_words_based_on_history, select_random_questions, check_all_words_mastered
 
 # 載入環境變數
 load_dotenv()
@@ -107,3 +107,7 @@ if __name__ == "__main__":
     
     # 更新測驗歷史
     update_history(quiz_name, correct_words, [w[0] for w in skipped_questions], failed_words)
+    
+    # 檢查是否所有題目都曾經答對過
+    if check_all_words_mastered(quiz_name, all_words):
+        print("\n恭喜！你已經完全掌握這個題庫的所有單字了！🎉")

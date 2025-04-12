@@ -94,4 +94,15 @@ def select_words_based_on_history(words, quiz_name, count=None):
     for word, _ in sorted_words[:count]:
         selected_words[word] = words[word]
     
-    return selected_words 
+    return selected_words
+
+def check_all_words_mastered(quiz_name, all_words):
+    history = load_history()
+    if quiz_name not in history:
+        return False
+    
+    quiz_data = history[quiz_name]
+    for word in all_words:
+        if word not in quiz_data["words"] or quiz_data["words"][word]["correct"] == 0:
+            return False
+    return True 
