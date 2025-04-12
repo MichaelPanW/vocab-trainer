@@ -44,76 +44,77 @@ def show_data_list(data_list):
 if __name__ == "__main__":
     data_list = get_data_list()
     show_data_list(data_list)
-    index = int(input("請輸入要測驗的題庫編號 >> ", "0"))
+    index = int(input("請輸入要測驗的題庫編號 >> ") or "0")
     quiz_name = data_list[index]
 
-    check = True
-    count = 0
-    all_words = get_words_by_info(quiz_name)
-    words = select_words_based_on_history(all_words, quiz_name)
-    total_questions = len(words)
-    skipped_questions = []
-    correct_words = []
-    failed_words = []
-
-    def finish_quiz():
-        print(config.EXIT_MESSAGE)
-        exit(1)
-
     while True:
-        if len(words) == 0:
-            break
+        check = True
+        count = 0
+        all_words = get_words_by_info(quiz_name)
+        words = select_words_based_on_history(all_words, quiz_name)
+        total_questions = len(words)
+        skipped_questions = []
+        correct_words = []
+        failed_words = []
 
-        if check:
-            answer, meaning = random.choice(list(words.items()))
-            check = False
-            print(meaning)
-            # 顯示頭尾
-            print(answer[0], "_" * (len(answer) - 2), answer[-1])
+        def finish_quiz():
+            print(config.EXIT_MESSAGE)
+            exit(1)
 
-        question = input("Ans >> ")
+        while True:
+            if len(words) == 0:
+                break
 
-        if question == answer:
-            check = True
-            count = 0
-            words.pop(answer)
-            correct_words.append(answer)
-            print(config.CORRECT_MESSAGE.format(count=len(words)))
-        elif question == "next":
-            print(f"放棄此題，答案是：{answer}")
-            skipped_questions.append((answer, meaning))
-            words.pop(answer)
-            check = True
-            count = 0
-        elif question != answer:
-            print(config.TRY_AGAIN_MESSAGE)
-            count += 1
+            if check:
+                answer, meaning = random.choice(list(words.items()))
+                check = False
+                print(meaning)
+                # 顯示頭尾
+                print(answer[0], "_" * (len(answer) - 2), answer[-1])
 
-        if count == 5:
-            print(config.FIRST_CHARACTER_HINT.format(answer=answer))
-        if count == 7:
-            print(config.LENGTH_HINT.format(answer=answer))
-        if count == 10:
-            print(config.FAILED_MESSAGE.format(answer=answer))
-            words.pop(answer)
-            failed_words.append(answer)
-            check = True
+            question = input("Ans >> ")
 
-        if question == "exit":
-            finish_quiz()
+            if question == answer:
+                check = True
+                count = 0
+                words.pop(answer)
+                correct_words.append(answer)
+                print(config.CORRECT_MESSAGE.format(count=len(words)))
+            elif question == "next":
+                print(f"放棄此題，答案是：{answer}")
+                skipped_questions.append((answer, meaning))
+                words.pop(answer)
+                check = True
+                count = 0
+            elif question != answer:
+                print(config.TRY_AGAIN_MESSAGE)
+                count += 1
 
-    print(config.END_MESSAGE)
-    print(f"本次測驗共 {total_questions} 題，答對 {len(correct_words)} 題。")
-    if skipped_questions:
-        print("\n放棄的題目：")
-        for word, meaning in skipped_questions:
-            print(f"{word}: {meaning}")
+            if count == 5:
+                print(config.FIRST_CHARACTER_HINT.format(answer=answer))
+            if count == 7:
+                print(config.LENGTH_HINT.format(answer=answer))
+            if count == 10:
+                print(config.FAILED_MESSAGE.format(answer=answer))
+                words.pop(answer)
+                failed_words.append(answer)
+                check = True
 
-    # 更新測驗歷史
-    update_history(
-        quiz_name, correct_words, [w[0] for w in skipped_questions], failed_words
-    )
+            if question == "exit":
+                finish_quiz()
 
-    # 檢查是否所有題目都曾經答對過
-    if check_all_words_mastered(quiz_name, all_words):
-        print("\n恭喜！你已經完全掌握這個題庫的所有單字了！🎉")
+        print(config.END_MESSAGE)
+        print(f"本次測驗共 {total_questions} 題，答對 {len(correct_words)} 題。")
+        if skipped_questions:
+            print("\n放棄的題目：")
+            for word, meaning in skipped_questions:
+                print(f"{word}: {meaning}")
+
+        # 更新測驗歷史
+        update_history(
+            quiz_name, correct_words, [w[0] for w in skipped_questions], failed_words
+        )
+
+        # 檢查是否所有題目都曾經答對過
+        if check_all_words_mastered(quiz_name, all_words):
+            print("\n恭喜！你已經完全掌握這個題庫的所有單字了！🎉")
