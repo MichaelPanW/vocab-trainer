@@ -4,9 +4,14 @@ import random
 import json
 import config
 import os
+from dotenv import load_dotenv
+from quiz_history import update_history, select_words_based_on_history, select_random_questions
 
-DATA_PATH = "../data"
-MAX_QUESTIONS = 10
+# 載入環境變數
+load_dotenv()
+
+DATA_PATH = os.getenv('DATA_PATH', '../data')
+MAX_QUESTIONS = int(os.getenv('MAX_QUESTIONS', 5))
 
 def get_quiz_data_from_input():
     return input("請輸入要測驗的題庫(0) >> ")
@@ -32,27 +37,20 @@ def show_data_list(data_list):
     for i, filename in enumerate(data_list):
         print(f"{i}: {filename}")
 
-def select_random_questions(words, count=MAX_QUESTIONS):
-    if len(words) <= count:
-        return words
-    selected_words = {}
-    word_list = list(words.items())
-    random.shuffle(word_list)
-    for word, meaning in word_list[:count]:
-        selected_words[word] = meaning
-    return selected_words
-
 if __name__ == "__main__":
     data_list = get_data_list()
     show_data_list(data_list)
     index = int(input("請輸入要測驗的題庫編號 >> "))
+    quiz_name = data_list[index]
 
     check = True
     count = 0
-    all_words = get_words_by_info(data_list[index])
-    words = select_random_questions(all_words)
+    all_words = get_words_by_info(quiz_name)
+    words = select_words_based_on_history(all_words, quiz_name)
     total_questions = len(words)
     skipped_questions = []
+    correct_words = []
+    failed_words = []
 
     def finish_quiz():
         print(config.EXIT_MESSAGE)
@@ -67,7 +65,7 @@ if __name__ == "__main__":
             check = False
             print(meaning)
             # 顯示頭尾
-            print(answer[0],'_'*len(answer), answer[-1])
+            print(answer[0],'_'*(len(answer)-2), answer[-1])
 
         question = input("Ans >> ")
 
@@ -75,6 +73,7 @@ if __name__ == "__main__":
             check = True
             count = 0
             words.pop(answer)
+            correct_words.append(answer)
             print(config.CORRECT_MESSAGE.format(count=len(words)))
         elif question == "next":
             print(f"放棄此題，答案是：{answer}")
@@ -93,14 +92,18 @@ if __name__ == "__main__":
         if count == 10:
             print(config.FAILED_MESSAGE.format(answer=answer))
             words.pop(answer)
+            failed_words.append(answer)
             check = True
 
         if question == "exit":
             finish_quiz()
 
     print(config.END_MESSAGE)
-    print(f"本次測驗共 {total_questions} 題，答對 {total_questions - len(words) - len(skipped_questions)} 題。")
+    print(f"本次測驗共 {total_questions} 題，答對 {len(correct_words)} 題。")
     if skipped_questions:
         print("\n放棄的題目：")
         for word, meaning in skipped_questions:
             print(f"{word}: {meaning}")
+    
+    # 更新測驗歷史
+    update_history(quiz_name, correct_words, [w[0] for w in skipped_questions], failed_words)

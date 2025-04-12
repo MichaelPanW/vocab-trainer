@@ -1,0 +1,52 @@
+{
+  "0412.json": {
+    "total_attempts": 2,
+    "words": {
+      "reveal": {
+        "correct": 1,
+        "wrong": 0,
+        "skipped": 0
+      },
+      "reliable": {
+        "correct": 1,
+        "wrong": 0,
+        "skipped": 0
+      },
+      "skies": {
+        "correct": 1,
+        "wrong": 0,
+        "skipped": 0
+      },
+      "equator": {
+        "correct": 1,
+        "wrong": 0,
+        "skipped": 0
+      },
+      "florist shop": {
+        "correct": 0,
+        "wrong": 0,
+        "skipped": 2
+      },
+      "busiest": {
+        "correct": 1,
+        "wrong": 0,
+        "skipped": 0
+      },
+      "annoyed": {
+        "correct": 1,
+        "wrong": 0,
+        "skipped": 0
+      },
+      "emerge": {
+        "correct": 0,
+        "wrong": 0,
+        "skipped": 1
+      },
+      "blond": {
+        "correct": 0,
+        "wrong": 0,
+        "skipped": 1
+      }
+    }
+  }
+}
