@@ -1,4 +1,4 @@
-# dictest
+# Vocabulary Test
 
 這是一個學習英文單字的模擬測驗程式。
 
@@ -85,6 +85,6 @@ dictest/
 └── docker-compose.yml
 ```
 
-## 授權
+## 參考資料
 
-MIT License
+ - [dictest](https://github.com/dsm-helper/dictest)
