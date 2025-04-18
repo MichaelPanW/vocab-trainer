@@ -21,6 +21,7 @@ load_dotenv()
 
 DATA_PATH = os.getenv("DATA_PATH", "../data")
 MAX_QUESTIONS = int(os.getenv("MAX_QUESTIONS", 5))
+SHOW_HEAD_TAIL = os.getenv("SHOW_HEAD_TAIL", "true").lower() == "true"
 
 
 def get_words_by_info(file_name):
@@ -100,7 +101,10 @@ if __name__ == "__main__":
                 # 變顏色
                 print(Fore.BLUE + meaning + Style.RESET_ALL)
                 # 顯示頭尾
-                print(answer[0], "_" * (len(answer) - 2), answer[-1])
+                if SHOW_HEAD_TAIL:
+                    print(answer[0], "_" * (len(answer) - 2), answer[-1])
+                else:
+                    print("_" * len(answer))
 
             question = input("Ans >> ")
             question_format = format_question(question)
